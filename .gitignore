@@ -1,15 +1,25 @@
-# FILE: .dockerignore
-# Git
-.git
-.gitignore
-.gitattributes
-
+# FILE: .gitignore
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Virtual environments
 venv/
@@ -34,22 +44,17 @@ ENV/
 .pytest_cache/
 .coverage
 htmlcov/
-tests/
-*.test.py
-
-# Documentation
-README.md
-*.md
-docs/
-
-# CI/CD
-.github/
-.gitlab-ci.yml
-.travis.yml
+.tox/
 
 # Logs
 *.log
 logs/
+
+# Docker
+.dockerignore
+
+# Redis
+dump.rdb
 
 # Temporary files
 *.tmp

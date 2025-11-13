@@ -1,5 +1,25 @@
-python-telegram-bot==20.7
-aiohttp>=3.9
-redis>=5.0.0
-pydantic>=2.7
-tldextract>=5.1.2
+# FILE: requirements.txt
+# Python dependencies for Telegram anti-spam bot
+
+# Telegram bot framework (v20+)
+python-telegram-bot[webhooks]==20.7
+
+# Async HTTP server for webhooks
+aiohttp==3.9.1
+
+# Redis client (async)
+redis[hiredis]==5.0.1
+
+# Environment configuration
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# URL parsing and TLD extraction
+tldextract==5.1.2
+
+# YAML parsing for rules config
+PyYAML==6.0.1
+
+# Testing (optional but recommended)
+pytest==7.4.3
+pytest-asyncio==0.21.1

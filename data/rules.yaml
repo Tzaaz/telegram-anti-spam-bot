@@ -1,0 +1,28 @@
+# FILE: data/rules.yaml
+# Spam detection rules configuration
+# Optional: if this file is missing, the bot uses hardcoded defaults
+
+# Thresholds for actions
+warn_threshold: 4
+hard_delete_threshold: 8
+
+# Additional suspicious TLDs (beyond defaults)
+suspicious_tlds:
+  - ru
+  - icu
+  - xyz
+  - top
+  - monster
+  - tk
+  - ml
+  - ga
+  - cf
+  - gq
+  - work
+  - click
+  - link
+  - loan
+  - win
+  - bid
+
+# Future: Add custom keywords, weights, etc.
