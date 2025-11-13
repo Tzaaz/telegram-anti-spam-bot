@@ -56,6 +56,10 @@ async def setup_webhook(app: web.Application):
     config = get_config()
     application: Application = app["telegram_app"]
 
+    # Initialize the Telegram application (required for webhook mode)
+    await application.initialize()
+    logger.info("✅ Telegram application initialized")
+
     # Initialize Redis store
     store = Store(config.REDIS_URL)
     await store.connect()
@@ -86,6 +90,10 @@ async def cleanup_webhook(app: web.Application):
     store: Store = application.bot_data.get("store")
     if store:
         await store.close()
+
+    # Shutdown the Telegram application
+    await application.shutdown()
+    logger.info("✅ Telegram application shutdown")
 
     # NOTE: We do NOT delete the webhook here!
     # Deleting webhook during shutdown causes issues with zero-downtime deployments
