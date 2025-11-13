@@ -87,12 +87,11 @@ async def cleanup_webhook(app: web.Application):
     if store:
         await store.close()
 
-    # Delete webhook
-    try:
-        await application.bot.delete_webhook()
-        logger.info("Webhook deleted")
-    except Exception as e:
-        logger.error(f"Error deleting webhook: {e}")
+    # NOTE: We do NOT delete the webhook here!
+    # Deleting webhook during shutdown causes issues with zero-downtime deployments
+    # on platforms like Render. The webhook should persist across restarts.
+    # Only delete webhook manually if switching to polling mode.
+    logger.info("Cleanup complete (webhook left intact)")
 
 
 def create_app() -> web.Application:
