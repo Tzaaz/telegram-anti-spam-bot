@@ -17,6 +17,7 @@ from utils import (
     has_unicode_tricks,
     contains_spam_keywords,
     get_suspicious_tlds,
+    has_non_english_text,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,8 @@ class RulesConfig:
         self.warn_threshold = WARN_THRESHOLD
         self.hard_delete_threshold = HARD_DELETE_THRESHOLD
         self.suspicious_tlds = get_suspicious_tlds()
+        self.check_non_english = True  # Enable non-English detection by default
+        self.non_english_threshold = 0.3  # 30% non-Latin characters
         self.load_config(config_path)
 
     def load_config(self, config_path: str):
@@ -70,9 +73,14 @@ class RulesConfig:
                 if extra_tlds:
                     self.suspicious_tlds.update(extra_tlds)
 
+                # Load non-English detection settings
+                self.check_non_english = config.get("check_non_english", True)
+                self.non_english_threshold = config.get("non_english_threshold", 0.3)
+
                 logger.info(
                     f"✅ Rules loaded: warn={self.warn_threshold}, "
-                    f"delete={self.hard_delete_threshold}"
+                    f"delete={self.hard_delete_threshold}, "
+                    f"non_english_check={self.check_non_english}"
                 )
         except Exception as e:
             logger.warning(f"Failed to load rules config: {e}, using defaults")
@@ -139,6 +147,12 @@ def calculate_spam_score(
     if has_unicode_tricks(text):
         score += 3
         reasons.append("Unicode tricks (+3)")
+
+    # Rule 7: Non-English text (Cyrillic, Arabic, Chinese, etc.)
+    if rules_config.check_non_english:
+        if has_non_english_text(text, threshold=rules_config.non_english_threshold):
+            score += 6
+            reasons.append("Non-English text (+6)")
 
     # Strict mode penalty: add +1 to any non-zero score
     if strict_mode and score > 0:

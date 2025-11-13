@@ -25,4 +25,9 @@ suspicious_tlds:
   - win
   - bid
 
-# Future: Add custom keywords, weights, etc.
+# Non-English text detection
+# Detects messages with significant non-Latin characters (Cyrillic, Arabic, Chinese, etc.)
+check_non_english: true  # Enable/disable non-English detection
+non_english_threshold: 0.3  # Minimum ratio of non-Latin chars (0.3 = 30%)
+# Set to false if your group allows multiple languages
+# Adjust threshold: lower = more strict, higher = more lenient

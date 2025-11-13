@@ -203,3 +203,73 @@ def normalize_text(text: str) -> str:
     text = unicodedata.normalize("NFKC", text)
     # Strip and lowercase
     return text.strip().lower()
+
+
+def has_non_english_text(text: str, threshold: float = 0.3) -> bool:
+    """
+    Detect if text contains significant non-English characters.
+
+    Args:
+        text: Text to analyze
+        threshold: Minimum ratio of non-Latin characters to flag (default 0.3 = 30%)
+
+    Returns:
+        True if text contains significant non-Latin script (Cyrillic, Arabic, Chinese, etc.)
+    """
+    # Remove whitespace, punctuation, numbers, and common symbols
+    cleaned = re.sub(r'[\s\d\.\,\!\?\;\:\-\(\)\[\]\{\}\"\'\/\\@#$%^&*+=~`|<>_]', '', text)
+
+    if len(cleaned) == 0:
+        return False
+
+    # Count non-Latin characters
+    non_latin_count = 0
+
+    for char in cleaned:
+        # Get unicode block/script
+        try:
+            char_name = unicodedata.name(char, '')
+
+            # Check for non-Latin scripts
+            if any(script in char_name for script in [
+                'CYRILLIC',      # Russian, Ukrainian, etc.
+                'ARABIC',        # Arabic
+                'HEBREW',        # Hebrew
+                'CJK',           # Chinese, Japanese, Korean
+                'HIRAGANA',      # Japanese
+                'KATAKANA',      # Japanese
+                'HANGUL',        # Korean
+                'DEVANAGARI',    # Hindi, Sanskrit
+                'THAI',          # Thai
+                'GREEK',         # Greek (often used in spam)
+            ]):
+                non_latin_count += 1
+        except (ValueError, TypeError):
+            # If we can't get the name, check code point ranges
+            code_point = ord(char)
+
+            # Common non-Latin ranges
+            if any([
+                0x0400 <= code_point <= 0x04FF,  # Cyrillic
+                0x0500 <= code_point <= 0x052F,  # Cyrillic Supplement
+                0x0600 <= code_point <= 0x06FF,  # Arabic
+                0x0750 <= code_point <= 0x077F,  # Arabic Supplement
+                0x0590 <= code_point <= 0x05FF,  # Hebrew
+                0x4E00 <= code_point <= 0x9FFF,  # CJK Unified Ideographs
+                0x3040 <= code_point <= 0x309F,  # Hiragana
+                0x30A0 <= code_point <= 0x30FF,  # Katakana
+                0xAC00 <= code_point <= 0xD7AF,  # Hangul
+                0x0900 <= code_point <= 0x097F,  # Devanagari
+                0x0E00 <= code_point <= 0x0E7F,  # Thai
+                0x0370 <= code_point <= 0x03FF,  # Greek
+            ]):
+                non_latin_count += 1
+
+    # Calculate ratio
+    ratio = non_latin_count / len(cleaned)
+
+    if ratio >= threshold:
+        logger.debug(f"Non-English text detected: {ratio:.1%} non-Latin characters")
+        return True
+
+    return False
