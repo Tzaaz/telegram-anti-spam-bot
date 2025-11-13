@@ -30,14 +30,16 @@ class Store:
     async def connect(self):
         """Establish Redis connection."""
         try:
-            # Parse URL and determine TLS
+            # Parse URL and determine TLS (auto-detected by redis-py from URL scheme)
             ssl_enabled = self.redis_url.startswith("rediss://")
+
+            # redis.from_url automatically handles SSL for rediss:// URLs
             self.client = redis.from_url(
                 self.redis_url,
                 encoding="utf-8",
                 decode_responses=True,
-                ssl_cert_reqs=None if ssl_enabled else None,
             )
+
             # Test connection
             await self.client.ping()
             logger.info(f"✅ Redis connected (TLS={ssl_enabled})")
